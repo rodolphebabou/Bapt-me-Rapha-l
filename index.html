@@ -1,48 +1,38 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html>
 <head>
-  <meta charset="UTF-8" />
-  <title>Baptême de Raphaël</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      /* Fond vert émeraude dégradé */
-      background: linear-gradient(135deg, #50C878, #046307);
-      color: white;
-      text-align: center;
-      padding: 50px;
-      min-height: 100vh;
-      margin: 0;
-    }
-    button {
-      padding: 15px 25px;
-      font-size: 18px;
-      background-color: #004d00;
-      border: none;
-      border-radius: 8px;
-      color: white;
-      cursor: pointer;
-      margin-top: 30px;
-      box-shadow: 0 4px 6px rgba(0,0,0,0.3);
-      transition: background-color 0.3s ease;
-    }
-    button:hover {
-      background-color: #027502;
-    }
-    h1 {
-      text-shadow: 2px 2px 5px #004000a0;
-    }
-    p {
-      text-shadow: 1px 1px 3px #003300a0;
-      font-size: 1.2em;
-    }
-  </style>
+  <title>Envoyer une photo</title>
 </head>
-<body>
-  <h1>Bienvenue au baptême de Raphaël</h1>
-  <p>Merci de déposer ici vos plus belles photos 📸</p>
-  <button onclick="window.open('https://uploadnow.io/f/ZSkwnmS', '_blank')">
-    Déposer mes photos
-  </button>
+<body style="background-color: #50C878; font-family: sans-serif; color: white; text-align: center; padding-top: 50px;">
+  <h1>Baptême de Raphaël 💚</h1>
+  <p>Choisissez vos photos à envoyer :</p>
+  <input type="file" id="file" />
+  <button onclick="upload()">Envoyer</button>
+  <p id="result"></p>
+
+  <script>
+    function upload() {
+      const file = document.getElementById('file').files[0];
+      if (!file) return alert("Choisissez un fichier");
+
+      const formData = new FormData();
+      formData.append("file", file);
+
+      fetch("https://uploadnow.io/upload", {
+        method: "POST",
+        body: formData
+      })
+      .then(r => r.json())
+      .then(data => {
+        document.getElementById("result").innerHTML = `
+          <p>✅ Fichier envoyé !</p>
+          <a href="${data.downloadPage}" target="_blank">Voir ou télécharger</a>
+        `;
+      })
+      .catch(err => {
+        document.getElementById("result").textContent = "Erreur lors de l'envoi.";
+      });
+    }
+  </script>
 </body>
 </html>
