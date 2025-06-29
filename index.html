@@ -4,29 +4,44 @@
   <meta charset="UTF-8">
   <title>📸 Baptême de Raphaël</title>
   <style>
+    html, body {
+      height: 100%;
+      margin: 0;
+    }
     body {
+      display: flex;
+      flex-direction: column;
+      justify-content: center; /* vertical centering */
+      align-items: center;     /* horizontal centering */
+      text-align: center;
       background-color: #50C878; /* vert émeraude */
       color: white;
       font-family: sans-serif;
-      text-align: center;
-      padding-top: 60px;
+      font-size: 1.5rem;
+      padding: 20px;
     }
     input[type="file"] {
       display: none;
     }
     button {
-      padding: 12px 24px;
-      font-size: 18px;
       margin-top: 20px;
+      padding: 12px 24px;
+      font-size: 1.2rem;
       cursor: pointer;
       border: none;
       background-color: white;
       color: #50C878;
       border-radius: 8px;
+      transition: background-color 0.3s ease;
+    }
+    button:hover {
+      background-color: #3da95f;
+      color: white;
     }
     #status {
       margin-top: 20px;
       font-weight: bold;
+      min-height: 1.5em;
     }
   </style>
 </head>
@@ -39,15 +54,16 @@
 
   <script>
     const fileInput = document.getElementById("file");
+    const status = document.getElementById("status");
+    const scriptURL = "https://script.google.com/macros/s/AKfycby_s4E0ZRirERh3hlRABErPaTiUGcIhDCGPfhMEIqB1ErsmmB96q4FEldFQC3R0K7SS/exec"; // ← Remplace par ton URL
 
-    fileInput.addEventListener("change", function () {
+    fileInput.addEventListener("change", () => {
       const files = fileInput.files;
       if (files.length === 0) return;
 
-      document.getElementById("status").textContent = "📤 Envoi en cours...";
+      status.textContent = "📤 Envoi en cours...";
 
       let success = 0, errors = 0;
-      const scriptURL = "https://script.google.com/macros/s/AKfycby_s4E0ZRirERh3hlRABErPaTiUGcIhDCGPfhMEIqB1ErsmmB96q4FEldFQC3R0K7SS/exec"; // 👈 Remplace ici
 
       Array.from(files).forEach(file => {
         const reader = new FileReader();
@@ -62,15 +78,15 @@
             .then(res => res.text())
             .then(() => {
               success++;
-              if (success + errors === files.length)
-                document.getElementById("status").textContent =
-                  `✅ ${success} fichier(s) envoyé(s), ❌ ${errors} échec(s)`;
+              if (success + errors === files.length) {
+                status.textContent = `✅ ${success} fichier(s) envoyé(s), ❌ ${errors} échec(s)`;
+              }
             })
             .catch(() => {
               errors++;
-              if (success + errors === files.length)
-                document.getElementById("status").textContent =
-                  `✅ ${success} fichier(s) envoyé(s), ❌ ${errors} échec(s)`;
+              if (success + errors === files.length) {
+                status.textContent = `✅ ${success} fichier(s) envoyé(s), ❌ ${errors} échec(s)`;
+              }
             });
         };
         reader.readAsDataURL(file);
