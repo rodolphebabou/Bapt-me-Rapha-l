@@ -11,27 +11,33 @@
     body {
       display: flex;
       flex-direction: column;
-      justify-content: center; /* vertical centering */
-      align-items: center;     /* horizontal centering */
+      justify-content: center;
+      align-items: center;
       text-align: center;
-      background-color: #50C878; /* vert émeraude */
+      background-color: #50C878;
       color: white;
       font-family: sans-serif;
-      font-size: 1.5rem;
+      font-size: 3rem; /* Texte très grand */
       padding: 20px;
+    }
+    h1 {
+      font-size: 4rem; /* Titre encore plus grand */
+    }
+    p {
+      font-size: 3rem;
     }
     input[type="file"] {
       display: none;
     }
     button {
-      margin-top: 20px;
-      padding: 12px 24px;
-      font-size: 1.2rem;
+      margin-top: 30px;
+      padding: 20px 40px;
+      font-size: 2.5rem;
       cursor: pointer;
       border: none;
       background-color: white;
       color: #50C878;
-      border-radius: 8px;
+      border-radius: 10px;
       transition: background-color 0.3s ease;
     }
     button:hover {
@@ -39,9 +45,10 @@
       color: white;
     }
     #status {
-      margin-top: 20px;
+      margin-top: 30px;
       font-weight: bold;
-      min-height: 1.5em;
+      font-size: 2.5rem;
+      min-height: 2em;
     }
   </style>
 </head>
@@ -55,7 +62,7 @@
   <script>
     const fileInput = document.getElementById("file");
     const status = document.getElementById("status");
-    const scriptURL = "https://script.google.com/macros/s/AKfycby_s4E0ZRirERh3hlRABErPaTiUGcIhDCGPfhMEIqB1ErsmmB96q4FEldFQC3R0K7SS/exec"; // ← Remplace par ton URL
+    const scriptURL = "https://script.google.com/macros/s/AKfycby_s4E0ZRirERh3hlRABErPaTiUGcIhDCGPfhMEIqB1ErsmmB96q4FEldFQC3R0K7SS/exec";
 
     fileInput.addEventListener("change", () => {
       const files = fileInput.files;
