@@ -1,37 +1,74 @@
 <!DOCTYPE html>
-<html>
+<html lang="fr">
 <head>
-  <title>Envoyer une photo</title>
+  <meta charset="UTF-8">
+  <title>Envoyer une photo pour le baptême de Raphaël</title>
+  <style>
+    body {
+      background-color: #50C878; /* vert émeraude */
+      font-family: sans-serif;
+      color: white;
+      text-align: center;
+      padding-top: 50px;
+    }
+    input, button {
+      margin-top: 15px;
+      padding: 10px 20px;
+      font-size: 16px;
+      border: none;
+      border-radius: 8px;
+    }
+    button {
+      background-color: white;
+      color: #50C878;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    #result a {
+      color: yellow;
+    }
+  </style>
 </head>
-<body style="background-color: #50C878; font-family: sans-serif; color: white; text-align: center; padding-top: 50px;">
+<body>
   <h1>Baptême de Raphaël 💚</h1>
-  <p>Choisissez vos photos à envoyer :</p>
-  <input type="file" id="file" />
+  <p>Ajoutez vos plus belles photos ci-dessous :</p>
+  <input type="file" id="file" multiple />
+  <br />
   <button onclick="upload()">Envoyer</button>
-  <p id="result"></p>
+  <div id="result"></div>
 
   <script>
-    function upload() {
-      const file = document.getElementById('file').files[0];
-      if (!file) return alert("Choisissez un fichier");
+    async function upload() {
+      const files = document.getElementById('file').files;
+      if (files.length === 0) {
+        alert("Merci de sélectionner un ou plusieurs fichiers");
+        return;
+      }
 
-      const formData = new FormData();
-      formData.append("file", file);
+      document.getElementById("result").innerHTML = "⏳ Envoi en cours...";
 
-      fetch("https://uploadnow.io/upload", {
-        method: "POST",
-        body: formData
-      })
-      .then(r => r.json())
-      .then(data => {
-        document.getElementById("result").innerHTML = `
-          <p>✅ Fichier envoyé !</p>
-          <a href="${data.downloadPage}" target="_blank">Voir ou télécharger</a>
-        `;
-      })
-      .catch(err => {
-        document.getElementById("result").textContent = "Erreur lors de l'envoi.";
-      });
+      for (let file of files) {
+        const formData = new FormData();
+        formData.append("file", file);
+
+        try {
+          const response = await fetch("https://uploadnow.io/upload", {
+            method: "POST",
+            body: formData
+          });
+
+          const data = await response.json();
+
+          if (data.downloadPage) {
+            const link = `<p>✅ ${file.name} envoyé ! <br><a href="${data.downloadPage}" target="_blank">Voir / Télécharger</a></p>`;
+            document.getElementById("result").innerHTML += link;
+          } else {
+            document.getElementById("result").innerHTML += `<p>❌ Échec de l'envoi pour ${file.name}</p>`;
+          }
+        } catch (err) {
+          document.getElementById("result").innerHTML += `<p>❌ Erreur réseau pour ${file.name}</p>`;
+        }
+      }
     }
   </script>
 </body>
