@@ -11,74 +11,15 @@
       text-align: center;
       padding-top: 60px;
     }
-    input, button {
-      padding: 10px;
-      font-size: 16px;
-      margin-top: 15px;
+    input[type="file"] {
+      display: none;
     }
-    #status {
+    button {
+      padding: 12px 24px;
+      font-size: 18px;
       margin-top: 20px;
-      font-weight: bold;
-    }
-  </style>
-</head>
-<body>
-  <h1>📸 Baptême de Raphaël</h1>
-  <p>Ajoutez vos photos ici :</p>
-  <input type="file" id="file" multiple />
-  <br>
-  <button onclick="upload()">Envoyer</button>
-  <p id="status"></p>
-
-  <script>
-    function upload() {
-      const fileInput = document.getElementById("file");
-      const files = fileInput.files;
-
-      if (files.length === 0) {
-        alert("Merci de sélectionner au moins un fichier !");
-        return;
-      }
-
-      document.getElementById("status").textContent = "📤 Envoi en cours...";
-
-      let successCount = 0;
-      let errorCount = 0;
-
-      Array.from(files).forEach((file, index) => {
-        const reader = new FileReader();
-
-        reader.onload = function(e) {
-          const base64Data = e.target.result.split(',')[1];
-          const form = new FormData();
-          form.append("fileData", base64Data);
-          form.append("fileName", file.name);
-          form.append("mimeType", file.type);
-
-          fetch("https://script.google.com/macros/s/AKfycby_s4E0ZRirERh3hlRABErPaTiUGcIhDCGPfhMEIqB1ErsmmB96q4FEldFQC3R0K7SS/exec", {
-            method: "POST",
-            body: form
-          })
-          .then(res => res.text())
-          .then(txt => {
-            successCount++;
-            if (successCount + errorCount === files.length) {
-              document.getElementById("status").textContent =
-                `✅ ${successCount} fichier(s) envoyé(s), ❌ ${errorCount} échec(s)`;
-            }
-          })
-          .catch(err => {
-            errorCount++;
-            if (successCount + errorCount === files.length) {
-              document.getElementById("status").textContent =
-                `✅ ${successCount} fichier(s) envoyé(s), ❌ ${errorCount} échec(s)`;
-            }
-          });
-        };
-
-        reader.readAsDataURL(file);
-      });
-    }
-  </script>
-</body>
-</html>
+      cursor: pointer;
+      border: none;
+      background-color: white;
+      color: #50C878;
+      border-rad
