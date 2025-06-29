@@ -2,73 +2,65 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <title>Envoyer une photo pour le baptême de Raphaël</title>
+  <title>Envoyer une photo pour le baptême</title>
   <style>
     body {
-      background-color: #50C878; /* vert émeraude */
-      font-family: sans-serif;
+      background-color: #50C878;
       color: white;
+      font-family: sans-serif;
       text-align: center;
-      padding-top: 50px;
+      padding-top: 60px;
     }
     input, button {
-      margin-top: 15px;
-      padding: 10px 20px;
+      padding: 10px;
       font-size: 16px;
-      border: none;
-      border-radius: 8px;
+      margin-top: 15px;
     }
-    button {
-      background-color: white;
-      color: #50C878;
+    #status {
+      margin-top: 20px;
       font-weight: bold;
-      cursor: pointer;
-    }
-    #result a {
-      color: yellow;
     }
   </style>
 </head>
 <body>
-  <h1>Baptême de Raphaël 💚</h1>
-  <p>Ajoutez vos plus belles photos ci-dessous :</p>
-  <input type="file" id="file" multiple />
-  <br />
+  <h1>📸 Baptême de Raphaël</h1>
+  <p>Ajoutez vos photos ici :</p>
+  <input type="file" id="file" />
+  <br>
   <button onclick="upload()">Envoyer</button>
-  <div id="result"></div>
+  <p id="status"></p>
 
   <script>
-    async function upload() {
-      const files = document.getElementById('file').files;
-      if (files.length === 0) {
-        alert("Merci de sélectionner un ou plusieurs fichiers");
+    function upload() {
+      const fileInput = document.getElementById("file");
+      const file = fileInput.files[0];
+
+      if (!file) {
+        alert("Merci de sélectionner un fichier !");
         return;
       }
 
-      document.getElementById("result").innerHTML = "⏳ Envoi en cours...";
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const base64Data = e.target.result.split(',')[1];
+        const form = new FormData();
+        form.append("fileData", base64Data);
+        form.append("fileName", file.name);
+        form.append("mimeType", file.type);
 
-      for (let file of files) {
-        const formData = new FormData();
-        formData.append("file", file);
-
-        try {
-          const response = await fetch("https://uploadnow.io/upload", {
-            method: "POST",
-            body: formData
-          });
-
-          const data = await response.json();
-
-          if (data.downloadPage) {
-            const link = `<p>✅ ${file.name} envoyé ! <br><a href="${data.downloadPage}" target="_blank">Voir / Télécharger</a></p>`;
-            document.getElementById("result").innerHTML += link;
-          } else {
-            document.getElementById("result").innerHTML += `<p>❌ Échec de l'envoi pour ${file.name}</p>`;
-          }
-        } catch (err) {
-          document.getElementById("result").innerHTML += `<p>❌ Erreur réseau pour ${file.name}</p>`;
-        }
-      }
+        fetch("https://script.google.com/macros/s/AKfycbz2lE0KQ1LY9pReRPMZUH1uIk9hkPDlmvCBwR5aA3I72o_2ETGvbdg_zMvA1Bk0YnQN/exec", {
+          method: "POST",
+          body: form
+        })
+        .then(res => res.text())
+        .then(txt => {
+          document.getElementById("status").textContent = txt;
+        })
+        .catch(err => {
+          document.getElementById("status").textContent = "Erreur : " + err;
+        });
+      };
+      reader.readAsDataURL(file);
     }
   </script>
 </body>
