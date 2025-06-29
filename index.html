@@ -9,7 +9,7 @@
       margin: 0;
     }
     body {
-      background-image: url('https://drive.google.com/uc?export=view&id=1ll_gR6HCAh7sEXGRqzBR4ruVYGU8imrP');
+      background-image: url('https://i.imgur.com/iGhtwCv.jpeg');
       background-size: cover;
       background-position: center;
       background-repeat: no-repeat;
@@ -66,37 +66,4 @@
       const files = fileInput.files;
       if (files.length === 0) return;
 
-      status.textContent = "📤 Envoi en cours...";
-
-      let success = 0, errors = 0;
-
-      Array.from(files).forEach(file => {
-        const reader = new FileReader();
-        reader.onload = e => {
-          const base64 = e.target.result.split(',')[1];
-          const form = new FormData();
-          form.append("fileData", base64);
-          form.append("fileName", file.name);
-          form.append("mimeType", file.type);
-
-          fetch(scriptURL, { method: "POST", body: form })
-            .then(res => res.text())
-            .then(() => {
-              success++;
-              if (success + errors === files.length) {
-                status.textContent = `✅ ${success} fichier(s) envoyé(s), ❌ ${errors} échec(s)`;
-              }
-            })
-            .catch(() => {
-              errors++;
-              if (success + errors === files.length) {
-                status.textContent = `✅ ${success} fichier(s) envoyé(s), ❌ ${errors} échec(s)`;
-              }
-            });
-        };
-        reader.readAsDataURL(file);
-      });
-    });
-  </script>
-</body>
-</html>
+      status.textContent = "📤 Envoi en cours
