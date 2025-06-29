@@ -2,19 +2,27 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <title>Envoyer une photo pour le baptême</title>
+  <title>📸 Baptême de Raphaël</title>
   <style>
     body {
-      background-color: #50C878;
+      background-color: #50C878; /* vert émeraude */
       color: white;
       font-family: sans-serif;
       text-align: center;
       padding-top: 60px;
     }
-    input, button {
-      padding: 10px;
-      font-size: 16px;
-      margin-top: 15px;
+    input[type="file"] {
+      display: none;
+    }
+    button {
+      padding: 12px 24px;
+      font-size: 18px;
+      margin-top: 20px;
+      cursor: pointer;
+      border: none;
+      background-color: white;
+      color: #50C878;
+      border-radius: 8px;
     }
     #status {
       margin-top: 20px;
@@ -25,43 +33,49 @@
 <body>
   <h1>📸 Baptême de Raphaël</h1>
   <p>Ajoutez vos photos ici :</p>
-  <input type="file" id="file" />
-  <br>
-  <button onclick="upload()">Envoyer</button>
+  <button onclick="document.getElementById('file').click()">Sélectionner & Envoyer des photos</button>
+  <input type="file" id="file" multiple />
   <p id="status"></p>
 
   <script>
-    function upload() {
-      const fileInput = document.getElementById("file");
-      const file = fileInput.files[0];
+    const fileInput = document.getElementById("file");
 
-      if (!file) {
-        alert("Merci de sélectionner un fichier !");
-        return;
-      }
+    fileInput.addEventListener("change", function () {
+      const files = fileInput.files;
+      if (files.length === 0) return;
 
-      const reader = new FileReader();
-      reader.onload = function(e) {
-        const base64Data = e.target.result.split(',')[1];
-        const form = new FormData();
-        form.append("fileData", base64Data);
-        form.append("fileName", file.name);
-        form.append("mimeType", file.type);
+      document.getElementById("status").textContent = "📤 Envoi en cours...";
 
-        fetch("https://script.google.com/macros/s/AKfycby_s4E0ZRirERh3hlRABErPaTiUGcIhDCGPfhMEIqB1ErsmmB96q4FEldFQC3R0K7SS/exec", {
-          method: "POST",
-          body: form
-        })
-        .then(res => res.text())
-        .then(txt => {
-          document.getElementById("status").textContent = txt;
-        })
-        .catch(err => {
-          document.getElementById("status").textContent = "Erreur : " + err;
-        });
-      };
-      reader.readAsDataURL(file);
-    }
+      let success = 0, errors = 0;
+      const scriptURL = "https://script.google.com/macros/s/AKfycby_s4E0ZRirERh3hlRABErPaTiUGcIhDCGPfhMEIqB1ErsmmB96q4FEldFQC3R0K7SS/exec"; // 👈 Remplace ici
+
+      Array.from(files).forEach(file => {
+        const reader = new FileReader();
+        reader.onload = e => {
+          const base64 = e.target.result.split(',')[1];
+          const form = new FormData();
+          form.append("fileData", base64);
+          form.append("fileName", file.name);
+          form.append("mimeType", file.type);
+
+          fetch(scriptURL, { method: "POST", body: form })
+            .then(res => res.text())
+            .then(() => {
+              success++;
+              if (success + errors === files.length)
+                document.getElementById("status").textContent =
+                  `✅ ${success} fichier(s) envoyé(s), ❌ ${errors} échec(s)`;
+            })
+            .catch(() => {
+              errors++;
+              if (success + errors === files.length)
+                document.getElementById("status").textContent =
+                  `✅ ${success} fichier(s) envoyé(s), ❌ ${errors} échec(s)`;
+            });
+        };
+        reader.readAsDataURL(file);
+      });
+    });
   </script>
 </body>
-</html> 
+</html>
