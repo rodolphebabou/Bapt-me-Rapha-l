@@ -7,6 +7,13 @@
     html, body {
       height: 100%;
       margin: 0;
+    }
+    body {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
       background-image: url('https://png.pngtree.com/thumb_back/fh260/background/20240105/pngtree-sleek-contemporary-emerald-green-texture-backdrop-image_13918475.png');
       background-size: cover;
       background-position: center;
@@ -15,84 +22,53 @@
       font-size: 3rem;
       padding: 20px;
     }
-
     h1 {
       font-size: 4rem;
       text-shadow: 2px 2px 4px #000;
-      text-align: center;
     }
-
     p {
-      font-size: 2.5rem;
+      font-size: 3rem;
       text-shadow: 2px 2px 4px #000;
-      text-align: center;
     }
-
     input[type="file"] {
       display: none;
     }
-
     button {
-      margin: 20px;
+      margin-top: 30px;
       padding: 20px 40px;
-      font-size: 2.2rem;
+      font-size: 2.5rem;
       cursor: pointer;
       border: none;
-      background-color: white;
+      background-color: write;
       color: #50C878;
       border-radius: 10px;
       transition: background-color 0.3s ease;
     }
-
     button:hover {
       background-color: #3da95f;
       color: white;
     }
-
     #status {
-      margin-top: 20px;
+      margin-top: 30px;
       font-weight: bold;
-      font-size: 2rem;
-      text-align: center;
+      font-size: 2.5rem;
+      min-height: 2em;
       text-shadow: 2px 2px 4px #000;
-    }
-
-    #gallery {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 20px;
-      justify-content: center;
-      margin-top: 40px;
-    }
-
-    #gallery img {
-      width: 300px;
-      max-height: 300px;
-      object-fit: cover;
-      border-radius: 10px;
-      box-shadow: 0 0 10px #000;
     }
   </style>
 </head>
 <body>
-
   <h1>📸 Baptême de Raphaël</h1>
   <p>Ajoutez vos photos & vidéos ici :</p>
-
-  <button onclick="document.getElementById('file').click()">📤 Sélectionner & Envoyer</button>
-  <button onclick="loadGallery()">🖼️ Voir la Galerie</button>
+  <button onclick="document.getElementById('file').click()">Sélectionner & Envoyer des photos & vidéos</button>
   <input type="file" id="file" multiple />
   <p id="status"></p>
-
-  <div id="gallery"></div>
 
   <script>
     const fileInput = document.getElementById("file");
     const status = document.getElementById("status");
-    const scriptUploadURL = "https://script.google.com/macros/s/AKfycbw1XbZN_NGYjqLOS9fkF1b4Y_k5sl3kbRZnPZh-nUxaLVgcJWmGTINDLth9_lMtXFDi/exec";
-    const scriptGalleryURL = "https://script.google.com/macros/s/AKfycbwxvEsz5tCd02yMJSbiJ8Quw2PrHG9uCV3uol3qfE1zA8XyScPIUWcTZriPTOx7Ivha/exec";
+    const scriptURL = "https://script.google.com/macros/s/AKfycbw1XbZN_NGYjqLOS9fkF1b4Y_k5sl3kbRZnPZh-nUxaLVgcJWmGTINDLth9_lMtXFDi/exec";
 
-    // Upload files
     fileInput.addEventListener("change", () => {
       const files = fileInput.files;
       if (files.length === 0) return;
@@ -110,7 +86,7 @@
           form.append("fileName", file.name);
           form.append("mimeType", file.type);
 
-          fetch(scriptUploadURL, { method: "POST", body: form })
+          fetch(scriptURL, { method: "POST", body: form })
             .then(res => res.text())
             .then(() => {
               success++;
@@ -128,32 +104,6 @@
         reader.readAsDataURL(file);
       });
     });
-
-    // Load gallery
-    function loadGallery() {
-      const gallery = document.getElementById("gallery");
-      gallery.innerHTML = "📥 Chargement de la galerie...";
-
-      fetch(scriptGalleryURL)
-        .then(res => res.json())
-        .then(images => {
-          gallery.innerHTML = "";
-          if (images.length === 0) {
-            gallery.innerHTML = "<p>Aucune image trouvée.</p>";
-            return;
-          }
-          images.forEach(url => {
-            const img = document.createElement("img");
-            img.src = url;
-            img.alt = "photo";
-            gallery.appendChild(img);
-          });
-        })
-        .catch(() => {
-          gallery.innerHTML = "❌ Erreur lors du chargement de la galerie.";
-        });
-    }
   </script>
-
 </body>
 </html>
