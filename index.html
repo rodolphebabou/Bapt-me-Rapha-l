@@ -1,19 +1,12 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8">
   <title>📸 Baptême de Raphaël</title>
   <style>
     html, body {
       height: 100%;
       margin: 0;
-    }
-    body {
-      display: flex;
-      flex-direction: column;
-      justify-content: flex-start;
-      align-items: center;
-      text-align: center;
       background-image: url('https://png.pngtree.com/thumb_back/fh260/background/20240105/pngtree-sleek-contemporary-emerald-green-texture-backdrop-image_13918475.png');
       background-size: cover;
       background-position: center;
@@ -21,84 +14,85 @@
       font-family: sans-serif;
       font-size: 3rem;
       padding: 20px;
-      min-height: 100vh;
     }
+
     h1 {
       font-size: 4rem;
       text-shadow: 2px 2px 4px #000;
-      margin-bottom: 10px;
+      text-align: center;
     }
+
     p {
-      font-size: 3rem;
+      font-size: 2.5rem;
       text-shadow: 2px 2px 4px #000;
-      margin-top: 0;
-      margin-bottom: 20px;
+      text-align: center;
     }
+
     input[type="file"] {
       display: none;
     }
+
     button {
-      margin-top: 20px;
+      margin: 20px;
       padding: 20px 40px;
-      font-size: 2.5rem;
+      font-size: 2.2rem;
       cursor: pointer;
       border: none;
       background-color: white;
       color: #50C878;
       border-radius: 10px;
       transition: background-color 0.3s ease;
-      user-select: none;
     }
+
     button:hover {
       background-color: #3da95f;
       color: white;
     }
+
     #status {
-      margin-top: 30px;
+      margin-top: 20px;
       font-weight: bold;
-      font-size: 2.5rem;
-      min-height: 2em;
+      font-size: 2rem;
+      text-align: center;
       text-shadow: 2px 2px 4px #000;
     }
+
     #gallery {
-      margin-top: 40px;
       display: flex;
       flex-wrap: wrap;
+      gap: 20px;
       justify-content: center;
-      gap: 10px;
-      max-width: 90vw;
-      overflow-y: auto;
-      max-height: 60vh;
+      margin-top: 40px;
     }
+
     #gallery img {
-      width: 200px;
-      height: auto;
-      border-radius: 10px;
-      box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+      width: 300px;
+      max-height: 300px;
       object-fit: cover;
+      border-radius: 10px;
+      box-shadow: 0 0 10px #000;
     }
   </style>
 </head>
 <body>
+
   <h1>📸 Baptême de Raphaël</h1>
   <p>Ajoutez vos photos & vidéos ici :</p>
-  
-  <button onclick="document.getElementById('file').click()">Sélectionner & Envoyer des photos & vidéos</button>
-  <button id="galleryBtn">Voir la galerie</button>
-  
+
+  <button onclick="document.getElementById('file').click()">📤 Sélectionner & Envoyer</button>
+  <button onclick="loadGallery()">🖼️ Voir la Galerie</button>
   <input type="file" id="file" multiple />
   <p id="status"></p>
+
   <div id="gallery"></div>
 
   <script>
     const fileInput = document.getElementById("file");
     const status = document.getElementById("status");
-    const galleryBtn = document.getElementById("galleryBtn");
-    const galleryDiv = document.getElementById("gallery");
+    const scriptUploadURL = "https://script.google.com/macros/s/AKfycbw1XbZN_NGYjqLOS9fkF1b4Y_k5sl3kbRZnPZh-nUxaLVgcJWmGTINDLth9_lMtXFDi/exec";
+    const scriptGalleryURL = "https://script.google.com/macros/s/AKfycbwxvEsz5tCd02yMJSbiJ8Quw2PrHG9uCV3uol3qfE1zA8XyScPIUWcTZriPTOx7Ivha/exec";
 
-    const uploadScriptURL = "https://script.google.com/macros/s/AKfycbw1XbZN_NGYjqLOS9fkF1b4Y_k5sl3kbRZnPZh-nUxaLVgcJWmGTINDLth9_lMtXFDi/exec";
-    const galleryScriptURL = "https://script.google.com/macros/s/AKfycbwxvEsz5tCd02yMJSbiJ8Quw2PrHG9uCV3uol3qfE1zA8XyScPIUWcTZriPTOx7Ivha/exec";
-
+    // Upload files
     fileInput.addEventListener("change", () => {
       const files = fileInput.files;
       if (files.length === 0) return;
@@ -116,7 +110,7 @@
           form.append("fileName", file.name);
           form.append("mimeType", file.type);
 
-          fetch(uploadScriptURL, { method: "POST", body: form })
+          fetch(scriptUploadURL, { method: "POST", body: form })
             .then(res => res.text())
             .then(() => {
               success++;
@@ -135,28 +129,31 @@
       });
     });
 
-    galleryBtn.addEventListener("click", () => {
-      galleryDiv.innerHTML = "Chargement de la galerie...";
-      fetch(galleryScriptURL)
+    // Load gallery
+    function loadGallery() {
+      const gallery = document.getElementById("gallery");
+      gallery.innerHTML = "📥 Chargement de la galerie...";
+
+      fetch(scriptGalleryURL)
         .then(res => res.json())
         .then(images => {
+          gallery.innerHTML = "";
           if (images.length === 0) {
-            galleryDiv.innerHTML = "Aucune photo disponible.";
+            gallery.innerHTML = "<p>Aucune image trouvée.</p>";
             return;
           }
-
-          galleryDiv.innerHTML = "";
           images.forEach(url => {
             const img = document.createElement("img");
             img.src = url;
-            img.alt = "Photo de la galerie";
-            galleryDiv.appendChild(img);
+            img.alt = "photo";
+            gallery.appendChild(img);
           });
         })
         .catch(() => {
-          galleryDiv.innerHTML = "Erreur lors du chargement de la galerie.";
+          gallery.innerHTML = "❌ Erreur lors du chargement de la galerie.";
         });
-    });
+    }
   </script>
+
 </body>
 </html>
