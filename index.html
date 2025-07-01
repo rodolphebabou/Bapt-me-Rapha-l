@@ -39,7 +39,7 @@
       font-size: 2.5rem;
       cursor: pointer;
       border: none;
-      background-color: white;
+      background-color: write;
       color: #50C878;
       border-radius: 10px;
       transition: background-color 0.3s ease;
@@ -55,21 +55,6 @@
       min-height: 2em;
       text-shadow: 2px 2px 4px #000;
     }
-    #progressContainer {
-      width: 80%;
-      background-color: rgba(255,255,255,0.3);
-      border-radius: 20px;
-      overflow: hidden;
-      margin-top: 20px;
-      height: 30px;
-      display: none;
-    }
-    #progressBar {
-      height: 100%;
-      width: 0%;
-      background-color: white;
-      transition: width 0.1s ease;
-    }
   </style>
 </head>
 <body>
@@ -77,16 +62,11 @@
   <p>Ajoutez vos photos & vidéos ici :</p>
   <button onclick="document.getElementById('file').click()">Sélectionner & Envoyer des photos & vidéos</button>
   <input type="file" id="file" multiple />
-  <div id="progressContainer">
-    <div id="progressBar"></div>
-  </div>
   <p id="status"></p>
 
   <script>
     const fileInput = document.getElementById("file");
     const status = document.getElementById("status");
-    const progressContainer = document.getElementById("progressContainer");
-    const progressBar = document.getElementById("progressBar");
     const scriptURL = "https://script.google.com/macros/s/AKfycby_s4E0ZRirERh3hlRABErPaTiUGcIhDCGPfhMEIqB1ErsmmB96q4FEldFQC3R0K7SS/exec";
 
     fileInput.addEventListener("change", () => {
@@ -94,59 +74,35 @@
       if (files.length === 0) return;
 
       status.textContent = "📤 Envoi en cours...";
-      progressContainer.style.display = "block";
-      progressBar.style.width = "0%";
 
-      let totalFiles = files.length;
-      let currentFile = 0;
       let success = 0, errors = 0;
 
-      const uploadNext = () => {
-        if (currentFile >= totalFiles) {
-          status.textContent = `✅ ${success} fichier(s) envoyé(s), ❌ ${errors} échec(s)`;
-          return;
-        }
-
-        const file = files[currentFile];
+      Array.from(files).forEach(file => {
         const reader = new FileReader();
-
         reader.onload = e => {
           const base64 = e.target.result.split(',')[1];
-          const formData = new FormData();
-          formData.append("fileData", base64);
-          formData.append("fileName", file.name);
-          formData.append("mimeType", file.type);
+          const form = new FormData();
+          form.append("fileData", base64);
+          form.append("fileName", file.name);
+          form.append("mimeType", file.type);
 
-          const xhr = new XMLHttpRequest();
-
-          xhr.upload.addEventListener("progress", (event) => {
-            if (event.lengthComputable) {
-              const percent = ((event.loaded / event.total) * 100);
-              progressBar.style.width = percent + "%";
-            }
-          });
-
-          xhr.onreadystatechange = () => {
-            if (xhr.readyState === 4) {
-              if (xhr.status === 200) {
-                success++;
-              } else {
-                errors++;
+          fetch(scriptURL, { method: "POST", body: form })
+            .then(res => res.text())
+            .then(() => {
+              success++;
+              if (success + errors === files.length) {
+                status.textContent = `✅ ${success} fichier(s) envoyé(s), ❌ ${errors} échec(s)`;
               }
-              currentFile++;
-              progressBar.style.width = "0%";
-              uploadNext();
-            }
-          };
-
-          xhr.open("POST", scriptURL, true);
-          xhr.send(formData);
+            })
+            .catch(() => {
+              errors++;
+              if (success + errors === files.length) {
+                status.textContent = `✅ ${success} fichier(s) envoyé(s), ❌ ${errors} échec(s)`;
+              }
+            });
         };
-
         reader.readAsDataURL(file);
-      };
-
-      uploadNext();
+      });
     });
   </script>
 </body>
