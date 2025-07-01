@@ -39,7 +39,7 @@
       font-size: 2.5rem;
       cursor: pointer;
       border: none;
-      background-color: write;
+      background-color: white;
       color: #50C878;
       border-radius: 10px;
       transition: background-color 0.3s ease;
@@ -55,6 +55,21 @@
       min-height: 2em;
       text-shadow: 2px 2px 4px #000;
     }
+    #progressContainer {
+      width: 80%;
+      background-color: rgba(255,255,255,0.2);
+      border-radius: 20px;
+      overflow: hidden;
+      margin-top: 20px;
+      height: 30px;
+      display: none;
+    }
+    #progressBar {
+      height: 100%;
+      width: 0%;
+      background-color: white;
+      transition: width 0.3s ease;
+    }
   </style>
 </head>
 <body>
@@ -62,22 +77,29 @@
   <p>Ajoutez vos photos & vidéos ici :</p>
   <button onclick="document.getElementById('file').click()">Sélectionner & Envoyer des photos & vidéos</button>
   <input type="file" id="file" multiple />
+  <div id="progressContainer">
+    <div id="progressBar"></div>
+  </div>
   <p id="status"></p>
 
   <script>
     const fileInput = document.getElementById("file");
     const status = document.getElementById("status");
+    const progressContainer = document.getElementById("progressContainer");
+    const progressBar = document.getElementById("progressBar");
     const scriptURL = "https://script.google.com/macros/s/AKfycby_s4E0ZRirERh3hlRABErPaTiUGcIhDCGPfhMEIqB1ErsmmB96q4FEldFQC3R0K7SS/exec";
 
     fileInput.addEventListener("change", () => {
       const files = fileInput.files;
       if (files.length === 0) return;
 
+      progressContainer.style.display = "block";
+      progressBar.style.width = "0%";
       status.textContent = "📤 Envoi en cours...";
 
       let success = 0, errors = 0;
 
-      Array.from(files).forEach(file => {
+      Array.from(files).forEach((file, index) => {
         const reader = new FileReader();
         reader.onload = e => {
           const base64 = e.target.result.split(',')[1];
@@ -90,19 +112,24 @@
             .then(res => res.text())
             .then(() => {
               success++;
-              if (success + errors === files.length) {
-                status.textContent = `✅ ${success} fichier(s) envoyé(s), ❌ ${errors} échec(s)`;
-              }
+              updateProgress(success + errors, files.length);
             })
             .catch(() => {
               errors++;
-              if (success + errors === files.length) {
-                status.textContent = `✅ ${success} fichier(s) envoyé(s), ❌ ${errors} échec(s)`;
-              }
+              updateProgress(success + errors, files.length);
             });
         };
         reader.readAsDataURL(file);
       });
+
+      function updateProgress(current, total) {
+        const percent = Math.round((current / total) * 100);
+        progressBar.style.width = percent + "%";
+
+        if (current === total) {
+          status.textContent = `✅ ${success} fichier(s) envoyé(s), ❌ ${errors} échec(s)`;
+        }
+      }
     });
   </script>
 </body>
