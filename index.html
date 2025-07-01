@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <title>📸 Baptême de Raphaël</title>
   <style>
     html, body {
@@ -11,7 +11,9 @@
     body {
       display: flex;
       flex-direction: column;
+      justify-content: center;
       align-items: center;
+      text-align: center;
       background-image: url('https://png.pngtree.com/thumb_back/fh260/background/20240105/pngtree-sleek-contemporary-emerald-green-texture-backdrop-image_13918475.png');
       background-size: cover;
       background-position: center;
@@ -25,66 +27,76 @@
       text-shadow: 2px 2px 4px #000;
     }
     p {
-      font-size: 2rem;
+      font-size: 3rem;
       text-shadow: 2px 2px 4px #000;
     }
+    input[type="file"] {
+      display: none;
+    }
     button {
-      margin: 10px;
+      margin-top: 30px;
       padding: 20px 40px;
-      font-size: 2rem;
+      font-size: 2.5rem;
       cursor: pointer;
       border: none;
       background-color: white;
       color: #50C878;
       border-radius: 10px;
-      transition: 0.3s ease;
+      transition: background-color 0.3s ease;
     }
     button:hover {
       background-color: #3da95f;
       color: white;
     }
-    input[type="file"] {
-      display: none;
-    }
     #status {
-      font-size: 1.5rem;
-      margin-top: 20px;
+      margin-top: 30px;
+      font-weight: bold;
+      font-size: 2.5rem;
+      min-height: 2em;
+      text-shadow: 2px 2px 4px #000;
     }
-    .gallery {
+    /* Galerie */
+    #gallery {
+      margin-top: 40px;
       display: flex;
       flex-wrap: wrap;
       justify-content: center;
-      margin-top: 30px;
       gap: 15px;
+      max-width: 1000px;
     }
-    .gallery img {
-      width: 200px;
-      height: auto;
-      border: 3px solid white;
+    #gallery img {
+      max-width: 200px;
       border-radius: 10px;
+      box-shadow: 0 0 5px black;
     }
   </style>
 </head>
 <body>
   <h1>📸 Baptême de Raphaël</h1>
   <p>Ajoutez vos photos & vidéos ici :</p>
-  <button onclick="document.getElementById('file').click()">📤 Sélectionner & Envoyer</button>
-  <button onclick="loadGallery()">📂 Voir la galerie</button>
+  <button onclick="document.getElementById('file').click()">Sélectionner & Envoyer des photos & vidéos</button>
   <input type="file" id="file" multiple />
+  
+  <button id="loadGalleryBtn">Voir la galerie</button>
+  
   <p id="status"></p>
-  <div class="gallery" id="gallery"></div>
+
+  <div id="gallery"></div>
 
   <script>
     const fileInput = document.getElementById("file");
     const status = document.getElementById("status");
     const gallery = document.getElementById("gallery");
+    const loadGalleryBtn = document.getElementById("loadGalleryBtn");
 
     const uploadScriptURL = "https://script.google.com/macros/s/AKfycbw1XbZN_NGYjqLOS9fkF1b4Y_k5sl3kbRZnPZh-nUxaLVgcJWmGTINDLth9_lMtXFDi/exec";
-    const galleryScriptURL = "https://script.google.com/macros/s/AKfycbwvje7cAAc0wS3NJYFskla25pvZl9aaOAkmTTQcawnHEiWuz_S5IhprKKD9vED_x4aM/exec";
+    const galleryScriptURL = "https://script.google.com/macros/s/AKfycbxvfyR6tHjEA11IJlQPyUHYwi8GoW33WJAMB-migqauPcWG1mlgg49rcgGGkcr--jzt/exec";
 
+    // Upload des fichiers
     fileInput.addEventListener("change", () => {
       const files = fileInput.files;
-      if (!files.length) return;
+      if (files.length === 0) return;
+
       status.textContent = "📤 Envoi en cours...";
 
       let success = 0, errors = 0;
@@ -102,34 +114,46 @@
             .then(res => res.text())
             .then(() => {
               success++;
-              status.textContent = `✅ ${success} fichier(s) envoyé(s), ❌ ${errors} échec(s)`;
+              if (success + errors === files.length) {
+                status.textContent = `✅ ${success} fichier(s) envoyé(s), ❌ ${errors} échec(s)`;
+                fileInput.value = ""; // reset input
+              }
             })
             .catch(() => {
               errors++;
-              status.textContent = `✅ ${success} fichier(s) envoyé(s), ❌ ${errors} échec(s)`;
+              if (success + errors === files.length) {
+                status.textContent = `✅ ${success} fichier(s) envoyé(s), ❌ ${errors} échec(s)`;
+              }
             });
         };
         reader.readAsDataURL(file);
       });
     });
 
-    function loadGallery() {
+    // Affichage de la galerie au clic du bouton
+    loadGalleryBtn.addEventListener("click", () => {
+      status.textContent = "⏳ Chargement de la galerie...";
       fetch(galleryScriptURL)
-        .then(res => res.json())
+        .then(response => response.json())
         .then(urls => {
-          gallery.innerHTML = '';
-          urls.forEach(url => {
-            const img = document.createElement('img');
-            img.src = url;
-            img.alt = "Image galerie";
-            gallery.appendChild(img);
-          });
+          gallery.innerHTML = ""; // vide la galerie avant ajout
+          if (urls.length === 0) {
+            gallery.innerHTML = "<p>Aucune photo disponible.</p>";
+          } else {
+            urls.forEach(url => {
+              const img = document.createElement("img");
+              img.src = url;
+              img.alt = "Photo uploadée";
+              gallery.appendChild(img);
+            });
+          }
+          status.textContent = "";
         })
         .catch(err => {
-          console.error("Erreur chargement galerie :", err);
-          alert("❌ Impossible de charger la galerie");
+          status.textContent = "❌ Impossible de charger la galerie.";
+          console.error(err);
         });
-    }
+    });
   </script>
 </body>
 </html>
