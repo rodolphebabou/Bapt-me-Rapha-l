@@ -11,6 +11,7 @@
     body {
       display: flex;
       flex-direction: column;
+      justify-content: center;
       align-items: center;
       text-align: center;
       background-image: url('https://png.pngtree.com/thumb_back/fh260/background/20240105/pngtree-sleek-contemporary-emerald-green-texture-backdrop-image_13918475.png');
@@ -38,7 +39,7 @@
       font-size: 2.5rem;
       cursor: pointer;
       border: none;
-      background-color: white;
+      background-color: write;
       color: #50C878;
       border-radius: 10px;
       transition: background-color 0.3s ease;
@@ -54,24 +55,6 @@
       min-height: 2em;
       text-shadow: 2px 2px 4px #000;
     }
-
-    #galerie {
-      margin-top: 40px;
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      gap: 20px;
-    }
-    #galerie img {
-      width: 300px;
-      max-width: 90vw;
-      border-radius: 10px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
-      transition: transform 0.3s;
-    }
-    #galerie img:hover {
-      transform: scale(1.05);
-    }
   </style>
 </head>
 <body>
@@ -80,8 +63,6 @@
   <button onclick="document.getElementById('file').click()">Sélectionner & Envoyer des photos & vidéos</button>
   <input type="file" id="file" multiple />
   <p id="status"></p>
-
-  <div id="galerie"></div>
 
   <script>
     const fileInput = document.getElementById("file");
@@ -123,24 +104,6 @@
         reader.readAsDataURL(file);
       });
     });
-
-    // Galerie
-    const galerie = document.getElementById("galerie");
-    const galerieURL = "https://script.google.com/macros/s/AKfycbwr9funE9veNdtjefe_ENxItvqD3l-ZCA6K2KEix0J2bkCZQkSGLCyGILHsVnID_QZobw/exec"; // Remplace par ton URL Apps Script
-
-    fetch(galerieURL)
-      .then(res => res.json())
-      .then(images => {
-        images.forEach(url => {
-          const img = document.createElement("img");
-          img.src = url;
-          galerie.appendChild(img);
-        });
-      })
-      .catch(err => {
-        galerie.innerHTML = "<p>Impossible de charger la galerie.</p>";
-        console.error(err);
-      });
   </script>
 </body>
 </html>
